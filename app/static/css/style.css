@@ -1,0 +1,91 @@
+@import "../third-party/fonts/fonts.css";
+@import "button.css";
+@import "cursors.css";
+
+:root {
+  --brand-hue-metallic: 230;
+  --brand-hue-blue: 230;
+  --brand-hue-yellow: 35;
+  --brand-hue-red: 5;
+  --brand-hue-green: 135;
+
+  --brand-metallic-dark: hsl(var(--brand-hue-blue), 33%, 33%);
+  --brand-metallic-medium: hsl(var(--brand-hue-metallic), 18%, 45%);
+  --brand-metallic-light: hsl(var(--brand-hue-metallic), 16%, 55%);
+  --brand-metallic-bright: hsl(var(--brand-hue-metallic), 18%, 71%);
+
+  --brand-sand-light: hsl(var(--brand-hue-yellow), 59%, 92%);
+  --brand-creme-light: hsl(var(--brand-hue-yellow), 60%, 97%);
+
+  --brand-blue: hsl(var(--brand-hue-blue), 80%, 60%);
+
+  --brand-red: hsl(var(--brand-hue-red), 55%, 40%);
+  --brand-red-light: hsl(var(--brand-hue-red), 54%, 95%);
+  --brand-red-bright: hsl(var(--brand-hue-red), 85%, 46%);
+
+  --brand-green: hsl(var(--brand-hue-green), 40%, 45%);
+  --brand-green-light: hsl(var(--brand-hue-green), 42%, 73%);
+  --brand-green-bright: hsl(var(--brand-hue-green), 70%, 45%);
+
+  --z-index-bar: 1;
+  --z-index-overlay: 2;
+}
+
+body {
+  margin: 0;
+  background: var(--brand-creme-light);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  margin: 0 auto;
+  padding-top: 55px; /* Account for menu bar plus some extra spacing */
+  padding-bottom: 40px; /* Account for status bar plus some extra spacing */
+}
+
+.header-bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: var(--z-index-bar);
+}
+
+.footer-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: var(--z-index-bar);
+}
+
+html {
+  font-family: "Overpass", sans-serif;
+}
+
+*:focus {
+  outline: none;
+}
+
+p {
+  line-height: 1.6;
+}
+
+a {
+  color: var(--brand-blue);
+  text-decoration: none;
+}
+
+.monospace {
+  font-family: "Overpass Mono", monospace;
+  font-size: 0.9em;
+}
+
+img {
+  object-fit: contain;
+}
+
+.question-icon {
+  max-width: 20px;
+}

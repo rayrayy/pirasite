@@ -1,0 +1,353 @@
+<template id="menu-bar-template">
+  <style>
+    @import "css/style.css";
+    @import "css/cursors.css";
+
+    a {
+      color: white;
+      display: block;
+      text-decoration: none;
+    }
+
+    a:hover {
+      cursor: pointer;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: block;
+      position: relative;
+      list-style: none;
+    }
+
+    li:hover > ul {
+      visibility: visible;
+      opacity: 1;
+      -webkit-transition: 0.3s;
+      transition: 0.3s;
+    }
+
+    :host {
+      display: flex;
+      height: 45px;
+      flex-direction: row;
+      align-items: center;
+      padding: 0 2rem;
+      color: white;
+      background-color: var(--brand-metallic-dark);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .logo {
+      position: relative;
+      box-sizing: border-box;
+      height: 90%;
+      padding: 6px 0;
+      margin-right: 1rem;
+    }
+
+    .logo img {
+      height: 100%;
+      position: relative;
+    }
+
+    .logo:before {
+      /* This creates a subtle glow behind tiny-hamster in the logo, which
+         makes him shine a bit better on the background. */
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 1px;
+      height: 25px;
+      width: 25px;
+      background-color: rgba(189, 215, 223, 0.2);
+      filter: blur(5px);
+    }
+
+    .header-item {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .items {
+      position: absolute;
+      left: -0.85rem;
+      top: 100%;
+      visibility: hidden;
+      opacity: 0;
+      min-width: 12em;
+    }
+
+    .item a {
+      padding: 0.5em 0.8em;
+    }
+
+    .group {
+      display: flex;
+      z-index: 1;
+      margin-left: 2rem;
+      padding-right: 17px;
+      height: 100%;
+      align-items: center;
+    }
+
+    .group > a:after {
+      --width: 5px;
+      --height: 7px;
+      content: "";
+      position: absolute;
+      top: 20px;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-left: var(--width) solid transparent;
+      border-right: var(--width) solid transparent;
+      border-top: var(--height) solid var(--brand-creme-light);
+    }
+
+    .subgroup .items {
+      left: 100%;
+      top: 0;
+    }
+
+    .item {
+      margin: 0;
+      padding: 0;
+    }
+
+    .group ul a:hover {
+      background: var(--brand-metallic-light);
+    }
+
+    .group ul a {
+      background-color: var(--brand-metallic-medium);
+    }
+
+    .subgroup:after {
+      --width: 5px;
+      --height: 7px;
+      content: "";
+      position: absolute;
+      top: 16px;
+      right: 11px;
+      width: 0;
+      height: 0;
+      border-top: var(--width) solid transparent;
+      border-bottom: var(--width) solid transparent;
+      border-left: var(--height) solid var(--brand-creme-light);
+    }
+
+    #cursor-list a {
+      text-transform: capitalize;
+    }
+
+    .nav-icon img {
+      margin-top: 5px;
+      max-height: 22px;
+    }
+
+    .nav-selected a:after {
+      content: "✓";
+      position: absolute;
+      right: 10px;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+  </style>
+
+  <div class="logo"><img src="/img/icl.png" /></div>
+  <ul class="groups header-item">
+    <li class="group">
+      <a>System</a>
+      <ul class="items">
+        <li class="item">
+          <a id="update-btn">Update</a>
+        </li>
+        <li class="item">
+          <a id="change-hostname-btn">Hostname</a>
+        </li>
+        <li class="item">
+          <a id="video-settings-btn">Video Settings</a>
+        </li>
+        <li class="item">
+          <a id="debug-dialog-btn">Logs</a>
+        </li>
+        <li class="item">
+          <a id="power-btn">Power</a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="group">
+      <a>Actions</a>
+      <ul class="items">
+        <li class="item">
+          <a id="paste-btn">Paste</a>
+        </li>
+        <li class="item">
+          <a id="screenshot-btn" href="/snapshot">Screenshot</a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="group">
+      <a>View</a>
+      <ul class="items">
+        <li class="item subgroup">
+          <a>Cursor</a>
+          <ul id="cursor-list" class="items">
+            <!-- JavaScript populates this list dynamically. -->
+          </ul>
+        </li>
+        <li class="item" id="keyboard-menu-item">
+          <a id="keyboard-btn">Show Keyboard</a>
+        </li>
+        <li class="item" id="keystroke-history-menu-item">
+          <a id="keystroke-history-btn">Enable Key History</a>
+        </li>
+        <li class="item">
+          <a id="fullscreen-btn">Full Screen</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <div class="spacer"></div>
+  <div class="header-item nav-icon">
+    <a href="https://github.com/mtlynch/tinypilot" target="_blank">
+      <img src="/img/GitHub-Mark-Light-120px-plus.png" />
+    </a>
+  </div>
+</template>
+
+<script>
+  (function () {
+    const doc = (document._currentScript || document.currentScript)
+      .ownerDocument;
+    const template = doc.querySelector("#menu-bar-template");
+
+    customElements.define(
+      "menu-bar",
+      class extends HTMLElement {
+        connectedCallback() {
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+          // All “simple”/standard menu items, that just emit a custom
+          // event without any further ado.
+          const menuButtonIdToEventId = {
+            "power-btn": "shutdown-dialog-requested",
+            "keyboard-btn": "keyboard-visibility-toggled",
+            "keystroke-history-btn": "keystroke-history-toggled",
+            "fullscreen-btn": "fullscreen-requested",
+            "paste-btn": "paste-requested",
+            "update-btn": "update-dialog-requested",
+            "change-hostname-btn": "change-hostname-dialog-requested",
+            "debug-dialog-btn": "debug-logs-dialog-requested",
+            "video-settings-btn": "video-settings-dialog-requested",
+          };
+          for (const [buttonId, eventId] of Object.entries(
+            menuButtonIdToEventId
+          )) {
+            this.shadowRoot
+              .getElementById(buttonId)
+              .addEventListener("click", (evt) => {
+                this.emitCustomEvent(eventId);
+                evt.preventDefault();
+              });
+          }
+
+          // Setup screenshot button.
+          this.shadowRoot
+            .getElementById("screenshot-btn")
+            .addEventListener("click", (evt) => {
+              evt.target.download =
+                "TinyPilot-" + new Date().toISOString() + ".jpg";
+            });
+
+          // Add cursor options to navbar.
+          const screenCursorOptions = [
+            "disabled", // To show on disconnect
+            "default", // Note that this is the browser default, not TinyPilot's default.
+            "none",
+            "crosshair",
+            "dot",
+            "pointer",
+            "cell",
+          ];
+          const cursorList = this.shadowRoot.getElementById("cursor-list");
+          for (const cursorOption of screenCursorOptions.splice(1)) {
+            const cursorLink = document.createElement("a");
+            cursorLink.setAttribute("href", "#");
+            cursorLink.innerText = cursorOption;
+            cursorLink.addEventListener("click", (evt) => {
+              this.emitCustomEvent("cursor-selected", { cursor: cursorOption });
+              evt.preventDefault();
+            });
+            const listItem = document.createElement("li");
+            listItem.appendChild(cursorLink);
+            listItem.classList.add("cursor-option", "item");
+            listItem.setAttribute("cursor", cursorOption);
+            cursorList.appendChild(listItem);
+          }
+        }
+
+        set isKeyboardVisible(isVisible) {
+          const menuItem = this.shadowRoot.getElementById("keyboard-menu-item");
+          if (isVisible) {
+            menuItem.classList.add("nav-selected");
+          } else {
+            menuItem.classList.remove("nav-selected");
+          }
+        }
+
+        set isInputIndicatorEnabled(isEnabled) {
+          const menuItem = this.shadowRoot.getElementById(
+            "keystroke-history-menu-item"
+          );
+          if (isEnabled) {
+            menuItem.classList.add("nav-selected");
+          } else {
+            menuItem.classList.remove("nav-selected");
+          }
+        }
+
+        emitCustomEvent(eventId, detail) {
+          this.dispatchEvent(
+            new CustomEvent(eventId, {
+              detail,
+              bubbles: true,
+              composed: true,
+            })
+          );
+        }
+
+        set cursor(newCursor) {
+          for (const cursorListItem of this.shadowRoot.querySelectorAll(
+            "#cursor-list li"
+          )) {
+            if (newCursor === cursorListItem.getAttribute("cursor")) {
+              cursorListItem.classList.add("nav-selected");
+            } else {
+              cursorListItem.classList.remove("nav-selected");
+            }
+          }
+        }
+      }
+    );
+  })();
+</script>

@@ -1,0 +1,58 @@
+@import "style.css";
+
+button,
+.btn {
+  display: inline-block;
+  border: none;
+  padding: 1rem 2rem;
+  margin: 1rem;
+  text-decoration: none;
+  background: var(--brand-metallic-light);
+  color: #ffffff;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: background 250ms ease-in-out, transform 150ms ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+button:hover,
+.btn:hover,
+button:focus,
+.btn:focus {
+  background-color: var(--brand-metallic-bright);
+}
+
+button:focus,
+.btn:focus {
+  outline: 1px solid #fff;
+  outline-offset: -4px;
+}
+
+button:active,
+.btn:active {
+  transform: scale(0.99);
+}
+
+.btn-success {
+  background-color: var(--brand-green);
+}
+
+.btn-success:hover {
+  background-color: var(--brand-green-bright);
+}
+
+.btn-success:disabled {
+  background-color: var(--brand-green-light);
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background-color: var(--brand-red);
+}
+
+.btn-danger:hover {
+  background-color: var(--brand-red-bright);
+}

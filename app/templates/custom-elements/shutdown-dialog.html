@@ -1,0 +1,167 @@
+<template id="shutdown-dialog-template">
+  <style>
+    @import "css/style.css";
+    @import "css/button.css";
+
+    #prompt,
+    #restarting,
+    #shutting-down,
+    #shutdown-complete {
+      display: none;
+    }
+
+    :host([state="prompt"]) #prompt {
+      display: block;
+    }
+
+    :host([state="restarting"]) #restarting {
+      display: block;
+    }
+
+    :host([state="shutting-down"]) #shutting-down {
+      display: block;
+    }
+
+    :host([state="shutdown-complete"]) #shutdown-complete {
+      display: block;
+    }
+  </style>
+
+  <div id="prompt">
+    <h3>Shut Down Pirasite Device?</h3>
+    <p>
+      Note that this will shut down <strong>Pirasite</strong>, not the machine
+      to which it is attached.
+    </p>
+    <button id="confirm-shutdown" class="btn-danger" type="button">
+      Shut Down
+    </button>
+    <button id="confirm-restart" class="btn-danger" type="button">
+      Restart
+    </button>
+    <button id="cancel-shutdown" type="button">Cancel</button>
+  </div>
+
+  <div id="restarting">
+    <h3>Restarting Pirasite Device</h3>
+    <progress-spinner></progress-spinner>
+  </div>
+
+  <div id="shutting-down">
+    <h3>Shutting Down Pirasite Device</h3>
+    <progress-spinner></progress-spinner>
+  </div>
+
+  <div id="shutdown-complete">
+    <h3>Shutdown Complete</h3>
+  </div>
+</template>
+
+<script src="/js/controllers.js"></script>
+<script>
+  (function () {
+    const doc = (document._currentScript || document.currentScript)
+      .ownerDocument;
+    const template = doc.querySelector("#shutdown-dialog-template");
+
+    customElements.define(
+      "shutdown-dialog",
+      class extends HTMLElement {
+        constructor() {
+          super();
+        }
+
+        connectedCallback() {
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.appendChild(template.content.cloneNode(true));
+          this.state = "prompt";
+
+          this.shadowRoot
+            .getElementById("confirm-shutdown")
+            .addEventListener("click", () => {
+              this._doShutdown(/*restart=*/ false);
+            });
+          this.shadowRoot
+            .getElementById("confirm-restart")
+            .addEventListener("click", () => {
+              this._doShutdown(/*restart=*/ true);
+            });
+          this.shadowRoot
+            .getElementById("cancel-shutdown")
+            .addEventListener("click", () => {
+              this._close();
+            });
+        }
+
+        get state() {
+          return this.getAttribute("state");
+        }
+
+        set state(newValue) {
+          this.setAttribute("state", newValue);
+        }
+
+        _doShutdown(restart) {
+          controllers
+            .shutdown(restart)
+            .then(() => {
+              this._emitShutdownStartedEvent(restart);
+              if (restart) {
+                this.state = "restarting";
+              } else {
+                this.state = "shutting-down";
+                // We can't tell when the system has fully shut down, but assume
+                // that it's done after 30 seconds.
+                setTimeout(() => {
+                  this.state = "shutdown-complete";
+                }, 30 * 1000);
+              }
+            })
+            .catch((error) => {
+              if (restart) {
+                this._handleShutdownFailure({
+                  title: "Failed to Restart Pirasite Device",
+                  details: error,
+                });
+              } else {
+                this._handleShutdownFailure({
+                  title: "Failed to Shut Down Pirasite Device",
+                  details: error,
+                });
+              }
+            });
+        }
+
+        _emitShutdownStartedEvent(restart) {
+          this.dispatchEvent(
+            new CustomEvent("shutdown-started", {
+              detail: { restart },
+              bubbles: true,
+              composed: true,
+            })
+          );
+        }
+
+        _handleShutdownFailure(errorInfo) {
+          this._close();
+          this.dispatchEvent(
+            new CustomEvent("shutdown-failure", {
+              detail: errorInfo,
+              bubbles: true,
+              composed: true,
+            })
+          );
+        }
+
+        _close() {
+          this.dispatchEvent(
+            new CustomEvent("dialog-closed", {
+              bubbles: true,
+              composed: true,
+            })
+          );
+        }
+      }
+    );
+  })();
+</script>

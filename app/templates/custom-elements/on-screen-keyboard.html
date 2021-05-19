@@ -1,0 +1,165 @@
+<script>
+  (function () {
+    const doc = (document._currentScript || document.currentScript)
+      .ownerDocument;
+    const template = doc.querySelector("#on-screen-keyboard-template");
+
+    customElements.define(
+      "on-screen-keyboard",
+      class extends HTMLElement {
+        connectedCallback() {
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+          this.addEventListener("keyclick", (evt) => {
+            this.onKeyClick(
+              evt.detail.key,
+              evt.detail.code,
+              evt.detail.isModifier
+            );
+          });
+          this.addEventListener("keyrelease", (evt) => {
+            this.emitKeyUpEvent(evt.detail.key, evt.detail.code);
+          });
+        }
+
+        onKeyClick(key, code, isModifier) {
+          if (
+            this.isShiftKeyPressed &&
+            !this.isMetaKeyPressed &&
+            !this.isLeftAltKeyPressed &&
+            !this.isRightAltKeyPressed &&
+            !this.isCtrlKeyPressed &&
+            !this.isSysrqKeyPressed
+          ) {
+            key = this.getShiftedKeyValue(key);
+          }
+
+          this.emitKeyDownEvent(key, code);
+
+          if (!isModifier) {
+            this.emitKeyUpEvent(key, code);
+
+            // Remove pressed state from all modifier keys if non-modifier key
+            // was pressed.
+            this.clearPressedKeys();
+          }
+        }
+
+        get isMetaKeyPressed() {
+          return this.isModifierKeyPressed("meta");
+        }
+
+        get isLeftAltKeyPressed() {
+          return (
+            this.shadowRoot.querySelectorAll(
+              '.alt-modifier[code="AltLeft"][pressed=true]'
+            ).length > 0
+          );
+        }
+
+        get isRightAltKeyPressed() {
+          return (
+            this.shadowRoot.querySelectorAll(
+              '.alt-modifier[code="AltRight"][pressed=true]'
+            ).length > 0
+          );
+        }
+
+        get isShiftKeyPressed() {
+          return this.isModifierKeyPressed("shift");
+        }
+
+        get isCtrlKeyPressed() {
+          return this.isModifierKeyPressed("ctrl");
+        }
+
+        get isSysrqKeyPressed() {
+          return this.isModifierKeyPressed("sysrq");
+        }
+
+        isModifierKeyPressed(modifier) {
+          return (
+            this.shadowRoot.querySelectorAll(
+              `.${modifier}-modifier[pressed=true]`
+            ).length > 0
+          );
+        }
+
+        emitKeyDownEvent(key, code) {
+          this.dispatchEvent(
+            new KeyboardEvent("keydown", {
+              bubbles: true,
+              composed: true,
+              key: key,
+              code: code,
+              metaKey: this.isMetaKeyPressed,
+              altKey: this.isLeftAltKeyPressed,
+              shiftKey: this.isShiftKeyPressed,
+              ctrlKey: this.isCtrlKeyPressed,
+            })
+          );
+        }
+
+        emitKeyUpEvent(key, code) {
+          this.dispatchEvent(
+            new KeyboardEvent("keyup", {
+              bubbles: true,
+              composed: true,
+              key: key,
+              code: code,
+              metaKey: this.isMetaKeyPressed,
+              altKey: this.isLeftAltKeyPressed,
+              shiftKey: this.isShiftKeyPressed,
+              ctrlKey: this.isCtrlKeyPressed,
+            })
+          );
+        }
+
+        clearPressedKeys() {
+          this.shadowRoot
+            .querySelectorAll("[modifier=true][pressed=true]")
+            .forEach((key) => {
+              key.isPressed = false;
+              this.emitKeyUpEvent(key.key, key.code);
+            });
+        }
+
+        getShiftedKeyValue(key) {
+          if (/^[a-z]$/.test(key)) {
+            return key.toUpperCase();
+          }
+          const shiftMappings = {
+            "`": "~",
+            "1": "!",
+            "2": "@",
+            "3": "#",
+            "4": "$",
+            "5": "%",
+            "6": "^",
+            "7": "&",
+            "8": "*",
+            "9": "(",
+            "0": ")",
+            "-": "_",
+            "=": "+",
+            "[": "{",
+            "]": "}",
+            "\\": "|",
+            ";": ":",
+            "'": '"',
+            ",": "<",
+            ".": ">",
+            "/": "?",
+          };
+          if (key in shiftMappings) {
+            return shiftMappings[key];
+          }
+          // This key is the same regardless of whether the shift key is
+          // pressed.
+          return key;
+        }
+      }
+    );
+  })();
+</script>

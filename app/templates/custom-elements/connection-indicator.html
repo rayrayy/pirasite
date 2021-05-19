@@ -1,0 +1,102 @@
+<template id="connection-indicator-template">
+  <style>
+    .status {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    content-tooltip {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .status-dot {
+      height: 1rem;
+      width: 1rem;
+      margin-right: 0.5rem;
+      border-radius: 50%;
+      display: inline-block;
+      /* Disconnected state */
+      background-color: var(--brand-red-bright);
+    }
+
+    :host([connected="true"]) .status-dot {
+      background-color: var(--brand-green-bright);
+    }
+
+    .connected-text,
+    .label-connected {
+      display: none;
+    }
+
+    :host([connected="true"]) .connected-text,
+    :host([connected="true"]) .label-connected {
+      display: block;
+    }
+
+    .disconnected-text,
+    .label-disconnected {
+      display: block;
+    }
+
+    :host([connected="true"]) .disconnected-text,
+    :host([connected="true"]) .label-disconnected {
+      display: none;
+    }
+  </style>
+  <div class="status">
+    <content-tooltip position="top-right">
+      <span class="status-dot"></span>
+      <div slot="text" class="connected-text">
+        You are connected to TinyPilot.
+      </div>
+      <div slot="text" class="disconnected-text">
+        Could not connect to TinyPilot:
+        <span id="disconnect-reason"></span>
+      </div>
+    </content-tooltip>
+    <div>
+      <span class="label-connected">Connected</span>
+      <span class="label-disconnected">Disconnected</span>
+    </div>
+  </div>
+</template>
+
+<script>
+  (function () {
+    const doc = (document._currentScript || document.currentScript)
+      .ownerDocument;
+    const template = doc.querySelector("#connection-indicator-template");
+
+    customElements.define(
+      "connection-indicator",
+      class extends HTMLElement {
+        connectedCallback() {
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        get connected() {
+          return this.getAttribute("connected");
+        }
+
+        set connected(isConnected) {
+          this.setAttribute("connected", isConnected);
+        }
+
+        get disconnectReason() {
+          return this.shadowRoot.querySelector("#disconnect-reason")
+            .textContent;
+        }
+
+        set disconnectReason(newValue) {
+          this.shadowRoot.querySelector(
+            "#disconnect-reason"
+          ).innerText = newValue;
+        }
+      }
+    );
+  })();
+</script>

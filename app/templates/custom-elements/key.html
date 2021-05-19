@@ -1,0 +1,180 @@
+<template id="key-template">
+  <style>
+    .key {
+      position: relative;
+      display: block;
+      float: left;
+      width: 50px;
+      height: 50px;
+      font-size: 12px;
+      background-color: #fff;
+      line-height: 16px;
+      border-radius: 2px;
+      margin: 1px;
+      padding: 1px;
+      cursor: pointer;
+      border: 1px solid rgb(187, 187, 187);
+      text-align: left;
+      transition: background-color 0.25s;
+    }
+
+    .key:hover {
+      background-color: #e3e3e3;
+    }
+
+    .key:active {
+      background-color: #8f8f8f;
+    }
+
+    :host([pressed="true"]) .key {
+      outline: 1px solid #333333;
+      background-color: #8f8f8f !important;
+    }
+
+    .key .content-top {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+    }
+
+    .key .content-bottom {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+    }
+
+    :host(.hidden) .key {
+      visibility: hidden;
+    }
+
+    :host(.accented) .key {
+      background-color: #dbdbdb;
+    }
+
+    :host(.key-collapse-half) .key {
+      width: 24px;
+    }
+
+    :host(.key-extend-half) .key {
+      width: 77px;
+    }
+
+    :host(.key-extend-full) .key {
+      width: 102px;
+    }
+
+    :host(.key-extend-full-half) .key {
+      width: 128px;
+    }
+
+    :host(.key-space) .key {
+      width: 229px;
+    }
+  </style>
+  <button type="button" class="key">
+    <span class="content-top">
+      <!-- default slot -->
+      <slot></slot>
+    </span>
+    <span class="content-bottom">
+      <slot name="bottom"></slot>
+    </span>
+  </button>
+</template>
+
+<script>
+  (function () {
+    const doc = (document._currentScript || document.currentScript)
+      .ownerDocument;
+    const template = doc.querySelector("#key-template");
+
+    customElements.define(
+      "keyboard-key",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          this.addEventListener("click", (evt) => {
+            this.togglePressedState();
+
+            // Don't send event if click removed "pressed" state
+            // on a modifier key.
+            if (!this.isModifier || this.isPressed) {
+              this.dispatchEvent(
+                new CustomEvent("keyclick", {
+                  detail: {
+                    key: this.key,
+                    code: this.code,
+                    isModifier: this.isModifier,
+                  },
+                  bubbles: true,
+                  composed: true,
+                })
+              );
+            } else {
+              this.dispatchEvent(
+                new CustomEvent("keyrelease", {
+                  detail: {
+                    key: this.key,
+                    code: this.code,
+                  },
+                  bubbles: true,
+                  composed: true,
+                })
+              );
+            }
+          });
+        }
+
+        connectedCallback() {
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        get code() {
+          return this.getAttribute("code");
+        }
+
+        get key() {
+          // If a key has a shifted label and an unshifted label, return the
+          // unshifted label.
+          const bottomLabel = this.querySelector("[slot=bottom]");
+          if (bottomLabel) {
+            return bottomLabel.innerText;
+          }
+
+          if (this.getAttribute("use-code")) {
+            return this.getAttribute("code");
+          }
+
+          const keyLabel = this.firstChild.data;
+          // If the key is a single A-Z character, return the lowercase
+          // version.
+          if (/^[A-Z]$/.test(keyLabel)) {
+            return keyLabel.toLowerCase();
+          }
+          return keyLabel;
+        }
+
+        get isModifier() {
+          return this.getAttribute("modifier") === "true";
+        }
+
+        get isPressed() {
+          return this.getAttribute("pressed") === "true";
+        }
+
+        set isPressed(newValue) {
+          // Only modifier keys can be "pressed".
+          if (this.isModifier) {
+            this.setAttribute("pressed", newValue);
+          }
+        }
+
+        togglePressedState() {
+          this.isPressed = !this.isPressed;
+        }
+      }
+    );
+  })();
+</script>

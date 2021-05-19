@@ -1,0 +1,245 @@
+<template id="video-settings-template">
+  <style>
+    @import "css/style.css";
+    @import "css/button.css";
+
+    #loading,
+    #edit,
+    #saving {
+      display: none;
+    }
+
+    :host([state="loading"]) #loading,
+    :host([state="edit"]) #edit,
+    :host([state="saving"]) #saving {
+      display: block;
+    }
+
+    .settings {
+      margin: 2.5rem 0 1.5rem 0;
+    }
+
+    .input-container {
+      display: inline-flex;
+      flex-direction: row;
+      margin-bottom: 1rem;
+    }
+
+    .input-container label {
+      display: inline-block;
+      text-align: right;
+      margin-right: 0.5rem;
+      width: 100px;
+    }
+
+    .input-container input {
+      display: inline-block;
+      width: 350px;
+    }
+
+    #video-fps-display,
+    #video-jpeg-quality-display {
+      display: inline-block;
+      width: 50px;
+    }
+  </style>
+  <div id="loading">
+    <h3>Retrieving Video Settings</h3>
+    <progress-spinner></progress-spinner>
+  </div>
+  <div id="edit">
+    <h3>Change Video Settings</h3>
+    <div class="settings">
+      <div class="input-container">
+        <label for="video-fps-slider">FPS</label>
+        <input type="range" id="video-fps-slider" min="1" max="30" />
+        <span id="video-fps-display"></span>
+      </div>
+      <div class="input-container">
+        <label for="video-jpeg-quality-slider">JPEG Quality</label>
+        <input type="range" id="video-jpeg-quality-slider" min="1" max="100" />
+        <span id="video-jpeg-quality-display"></span>
+      </div>
+    </div>
+    <button class="save-btn btn-success" type="button">
+      Apply
+    </button>
+    <button class="close-btn" type="button">Cancel</button>
+  </div>
+  <div id="saving">
+    <h3>Applying Video Settings</h3>
+    <progress-spinner></progress-spinner>
+  </div>
+</template>
+
+<script src="/js/controllers.js"></script>
+<script>
+  (function () {
+    const doc = (document._currentScript || document.currentScript)
+      .ownerDocument;
+    const template = doc.querySelector("#video-settings-template");
+
+    customElements.define(
+      "video-settings-dialog",
+      class extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: "open" });
+        }
+
+        connectedCallback() {
+          this.shadowRoot.appendChild(template.content.cloneNode(true));
+          this.shadowRoot
+            .querySelector(".close-btn")
+            .addEventListener("click", () => this._close());
+          this.shadowRoot
+            .querySelector("#edit .save-btn")
+            .addEventListener("click", () => this._saveSettings());
+          this.shadowRoot
+            .querySelector("#video-fps-slider")
+            .addEventListener("input", (event) => {
+              this._setVideoFpsDisplay(event.target.value);
+            });
+          this.shadowRoot
+            .querySelector("#video-jpeg-quality-slider")
+            .addEventListener("input", (event) => {
+              this._setVideoJpegQualityDisplay(event.target.value);
+            });
+        }
+
+        get state() {
+          return this.getAttribute("state");
+        }
+
+        set state(newValue) {
+          this.setAttribute("state", newValue);
+        }
+
+        _setVideoFpsDisplay(videoFps) {
+          const videoFpsDisplayElement = this.shadowRoot.querySelector(
+            "#video-fps-display"
+          );
+          videoFpsDisplayElement.innerHTML = videoFps;
+        }
+
+        _setVideoJpegQualityDisplay(videoJpegQuality) {
+          const videoJpegQualityDisplayElement = this.shadowRoot.querySelector(
+            "#video-jpeg-quality-display"
+          );
+          videoJpegQualityDisplayElement.innerHTML = videoJpegQuality;
+        }
+
+        _getVideoFps() {
+          return controllers
+            .getVideoFps()
+            .then((videoFps) => {
+              this.shadowRoot.querySelector(
+                "#video-fps-slider"
+              ).value = videoFps;
+              this._setVideoFpsDisplay(videoFps);
+            })
+            .catch((error) => {
+              this._displayErrorDialog({
+                title: "Failed to Load Video FPS",
+                details: error,
+              });
+              return Promise.reject(error);
+            });
+        }
+
+        _getVideoJpegQuality() {
+          return controllers
+            .getVideoJpegQuality()
+            .then((videoJpegQuality) => {
+              this.shadowRoot.querySelector(
+                "#video-jpeg-quality-slider"
+              ).value = videoJpegQuality;
+              this._setVideoJpegQualityDisplay(videoJpegQuality);
+            })
+            .catch((error) => {
+              this._displayErrorDialog({
+                title: "Failed to Load Video JPEG Quality",
+                details: error,
+              });
+              return Promise.reject(error);
+            });
+        }
+
+        getSettings() {
+          this.state = "loading";
+          Promise.all([this._getVideoFps(), this._getVideoJpegQuality()])
+            .then(() => {
+              this.state = "edit";
+            })
+            .catch(() => {
+              // Ignore errors here because they have already been handled by
+              // their individual setting load function.
+            });
+        }
+
+        _saveVideoFps() {
+          let videoFps = this.shadowRoot.querySelector("#video-fps-slider")
+            .value;
+          return controllers.setVideoFps(videoFps).catch((error) => {
+            this._displayErrorDialog({
+              title: "Failed to Save Video FPS",
+              details: error,
+            });
+            return Promise.reject(error);
+          });
+        }
+
+        _saveVideoJpegQuality() {
+          let videoJpegQuality = this.shadowRoot.querySelector(
+            "#video-jpeg-quality-slider"
+          ).value;
+          return controllers
+            .setVideoJpegQuality(videoJpegQuality)
+            .catch((error) => {
+              this._displayErrorDialog({
+                title: "Failed to Save Video JPEG Quality",
+                details: error,
+              });
+              return Promise.reject(error);
+            });
+        }
+
+        _saveSettings() {
+          this.state = "saving";
+          Promise.all([this._saveVideoFps(), this._saveVideoJpegQuality()])
+            .then(controllers.applyVideoSettings)
+            .then(() => {
+              // Note: After the video stream stops, it doesn't try to
+              // reconnect. So in order to restart the video stream, we need to
+              // reload the page.
+              location.reload();
+            })
+            .catch(() => {
+              // Ignore errors here because they have already been handled by
+              // their individual setting save function.
+            });
+        }
+
+        _close() {
+          this.dispatchEvent(
+            new CustomEvent("dialog-closed", {
+              bubbles: true,
+              composed: true,
+            })
+          );
+        }
+
+        _displayErrorDialog(errorInfo) {
+          this._close();
+          this.dispatchEvent(
+            new CustomEvent("video-settings-failure", {
+              detail: errorInfo,
+              bubbles: true,
+              composed: true,
+            })
+          );
+        }
+      }
+    );
+  })();
+</script>

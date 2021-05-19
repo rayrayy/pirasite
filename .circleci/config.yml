@@ -1,0 +1,66 @@
+version: 2.1
+jobs:
+  check_whitespace:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - checkout
+      - run:
+          name: Check for trailing whitespace
+          command: ./dev-scripts/check-trailing-whitespace
+      - run:
+          name: Check that all text files end in a trailing newline
+          command: ./dev-scripts/check-trailing-newline
+  check_bash:
+    docker:
+      - image: koalaman/shellcheck-alpine:v0.7.1
+    steps:
+      - run:
+          name: Install dependencies
+          command: apk add bash git openssh-client grep
+      - checkout
+      - run:
+          name: Run static analysis on bash scripts
+          command: ./dev-scripts/check-bash
+  build_python:
+    docker:
+      - image: circleci/python:3.7.3
+    steps:
+      - checkout
+      - run:
+          name: Create virtual environment
+          command: python3 -m venv venv
+      - run:
+          name: Install requirements and run build script
+          command: |
+            . venv/bin/activate
+            pip install --requirement requirements.txt
+            pip install --requirement dev_requirements.txt
+            ./dev-scripts/build-python
+  format_frontend:
+    docker:
+      - image: circleci/node:13.2.0-stretch
+    steps:
+      - checkout
+      - run:
+          name: Install prettier globally
+          command: npm install prettier@2.0.5
+      - run:
+          name: Check frontend formatting
+          command: ./dev-scripts/check-frontend-format
+  e2e:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - checkout
+      - run:
+          name: Run TinyPilot e2e tests
+          command: ./e2e/docker-test
+workflows:
+  test:
+    jobs:
+      - check_whitespace
+      - check_bash
+      - build_python
+      - format_frontend
+      - e2e

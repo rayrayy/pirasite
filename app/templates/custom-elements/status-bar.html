@@ -1,0 +1,61 @@
+<template id="status-bar-template">
+  <style>
+    @import "css/style.css";
+
+    :host {
+      display: flex;
+      height: 31px;
+      flex-direction: row;
+      align-items: center;
+      padding: 0 1.25rem;
+      color: white;
+      font-size: 0.9rem;
+      background-color: var(--brand-metallic-medium);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+  </style>
+
+  <div class="item">
+    <connection-indicator id="connection-indicator"></connection-indicator>
+  </div>
+  <div class="spacer"></div>
+  <div class="item">
+    <keystroke-history id="keystroke-history"></keystroke-history>
+  </div>
+</template>
+
+<script>
+  (function () {
+    const doc = (document._currentScript || document.currentScript)
+      .ownerDocument;
+    const template = doc.querySelector("#status-bar-template");
+
+    customElements.define(
+      "status-bar",
+      class extends HTMLElement {
+        connectedCallback() {
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        get connectionIndicator() {
+          return this.shadowRoot.getElementById("connection-indicator");
+        }
+
+        get keystrokeHistory() {
+          return this.shadowRoot.getElementById("keystroke-history");
+        }
+      }
+    );
+  })();
+</script>
