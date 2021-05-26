@@ -17,14 +17,6 @@
       display: block;
     }
 
-    .action-buttons {
-      text-align: left;
-    }
-
-    .action-buttons button {
-      margin: 0 1rem 0 0;
-    }
-
     #logs-success .logs {
       padding: 0.25rem 0.5rem;
       background-color: white;
@@ -37,7 +29,7 @@
     }
 
     #url-success .url-wrapper {
-      margin: 1rem 0;
+      margin: 3rem 0;
     }
 
     #url-success .url {
@@ -55,15 +47,13 @@
 
   <div id="logs-success">
     <h3>Debug Logs</h3>
-    <div class="action-buttons">
-      <button class="share-btn btn-action btn-small" type="button">
-        Get Shareable URL
-      </button>
-      <button class="copy-btn btn-action btn-small" type="button">
-        Copy to Clipboard
-      </button>
-    </div>
     <p class="logs monospace"></p>
+    <button class="share-btn btn-success" type="button">
+      Get Shareable URL
+    </button>
+    <button class="copy-btn btn-success" type="button">
+      Copy to Clipboard
+    </button>
     <button class="close-btn" type="button">Close</button>
   </div>
 
@@ -77,10 +67,10 @@
     <h3>Debug Logs</h3>
     <div class="url-wrapper">
       <a class="url"></a>
-      <button class="copy-btn btn-action" type="button">
-        Copy to Clipboard
-      </button>
     </div>
+    <button class="copy-btn btn-success" type="button">
+      Copy to clipboard
+    </button>
     <button class="close-btn" type="button">Close</button>
   </div>
 </template>

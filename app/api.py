@@ -76,7 +76,6 @@ def update_get():
             "updateError": null
         }
     """
-
     status, error = update.status.get()
     return json_response.success({'status': str(status), 'updateError': error})
 
@@ -100,6 +99,15 @@ def update_put():
     except update.launcher.Error as e:
         return json_response.error(e), 500
     return json_response.success()
+
+# @api_blueprint.route('/boot', methods=['PUT'])
+# def boot():
+
+#     try:
+#         local_system.shutdown()
+#     except update.launcher.Error as e:
+#         return json_response.error(e), 500
+#     return json_response.success()
 
 
 @api_blueprint.route('/version', methods=['GET'])

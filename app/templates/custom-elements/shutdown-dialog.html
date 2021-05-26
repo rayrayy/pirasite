@@ -28,33 +28,30 @@
   </style>
 
   <div id="prompt">
-    <h3>Shut Down TinyPilot Device?</h3>
-    <p>
-      Note that this will shut down <strong>TinyPilot</strong>, not the machine
-      to which it is attached.
-    </p>
+    <h3>Which action would you like to take?</h3>
+
     <button id="confirm-shutdown" class="btn-danger" type="button">
-      Shut Down
+      Power Button
     </button>
     <button id="confirm-restart" class="btn-danger" type="button">
-      Restart
+      Restart Button
     </button>
-    <button id="cancel-shutdown" type="button">Cancel</button>
+    <button id="cancel-shutdown" type="button">Exit</button>
   </div>
-
+  <!-- 
   <div id="restarting">
-    <h3>Restarting TinyPilot Device</h3>
+    <h3>Rebooting...</h3>
     <progress-spinner></progress-spinner>
   </div>
 
   <div id="shutting-down">
-    <h3>Shutting Down TinyPilot Device</h3>
+    <h3>Powering server up/down...</h3>
     <progress-spinner></progress-spinner>
   </div>
 
   <div id="shutdown-complete">
     <h3>Shutdown Complete</h3>
-  </div>
+  </div> -->
 </template>
 
 <script src="/js/controllers.js"></script>
@@ -79,17 +76,20 @@
           this.shadowRoot
             .getElementById("confirm-shutdown")
             .addEventListener("click", () => {
+              location.reload();
               this._doShutdown(/*restart=*/ false);
             });
           this.shadowRoot
             .getElementById("confirm-restart")
             .addEventListener("click", () => {
+              location.reload();
               this._doShutdown(/*restart=*/ true);
             });
           this.shadowRoot
             .getElementById("cancel-shutdown")
             .addEventListener("click", () => {
               this._close();
+              location.reload();
             });
         }
 
@@ -109,23 +109,23 @@
               if (restart) {
                 this.state = "restarting";
               } else {
-                this.state = "shutting-down";
-                // We can't tell when the system has fully shut down, but assume
-                // that it's done after 30 seconds.
-                setTimeout(() => {
-                  this.state = "shutdown-complete";
-                }, 30 * 1000);
+                // this.state = "shutting-down";
+                // // We can't tell when the system has fully shut down, but assume
+                // // that it's done after 30 seconds.
+                // setTimeout(() => {
+                //   this.state = "shutdown-complete";
+                // }, 3* 1000);
               }
             })
             .catch((error) => {
               if (restart) {
                 this._handleShutdownFailure({
-                  title: "Failed to Restart TinyPilot Device",
+                  title: "Failed to Restart Pirasite Device",
                   details: error,
                 });
               } else {
                 this._handleShutdownFailure({
-                  title: "Failed to Shut Down TinyPilot Device",
+                  title: "Failed to Shut Down Pirasite Device",
                   details: error,
                 });
               }
