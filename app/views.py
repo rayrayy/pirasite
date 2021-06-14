@@ -5,8 +5,8 @@ from find_files import find as find_files
 
 views_blueprint = flask.Blueprint('views', __name__, url_prefix='')
 
-# Default hostname of TinyPilot device.
-_DEFAULT_HOSTNAME = 'tinypilot'
+# Default hostname of Pirasite device.
+_DEFAULT_HOSTNAME = 'Pirasite'
 
 
 @views_blueprint.route('/', methods=['GET'])

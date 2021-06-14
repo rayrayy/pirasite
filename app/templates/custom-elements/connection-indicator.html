@@ -49,11 +49,9 @@
   <div class="status">
     <content-tooltip position="top-right">
       <span class="status-dot"></span>
-      <div slot="text" class="connected-text">
-        You are connected to TinyPilot.
-      </div>
+      <div slot="text" class="connected-text">Target device is connected.</div>
       <div slot="text" class="disconnected-text">
-        Could not connect to TinyPilot:
+        Target device could not be connected:
         <span id="disconnect-reason"></span>
       </div>
     </content-tooltip>
@@ -92,9 +90,8 @@
         }
 
         set disconnectReason(newValue) {
-          this.shadowRoot.querySelector(
-            "#disconnect-reason"
-          ).innerText = newValue;
+          this.shadowRoot.querySelector("#disconnect-reason").innerText =
+            newValue;
         }
       }
     );

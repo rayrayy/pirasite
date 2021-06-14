@@ -118,8 +118,8 @@ function onSocketConnect() {
 function onSocketDisconnect(reason) {
   setCursor("disabled", false);
   connectedToServer = false;
-  const connectionIndicator = document.getElementById("status-bar")
-    .connectionIndicator;
+  const connectionIndicator =
+    document.getElementById("status-bar").connectionIndicator;
   connectionIndicator.connected = false;
   connectionIndicator.disconnectReason = reason;
   document.getElementById("app").focus();
@@ -184,11 +184,12 @@ function sendMouseEvent(
     (response) => {
       const requestEndTime = unixTime();
       const requestRtt = requestEndTime - requestStartTime;
-      remoteScreen.millisecondsBetweenMouseEvents = recalculateMouseEventThrottle(
-        remoteScreen.millisecondsBetweenMouseEvents,
-        requestRtt,
-        response.success
-      );
+      remoteScreen.millisecondsBetweenMouseEvents =
+        recalculateMouseEventThrottle(
+          remoteScreen.millisecondsBetweenMouseEvents,
+          requestRtt,
+          response.success
+        );
     }
   );
 }
@@ -290,8 +291,8 @@ menuBar.addEventListener("cursor-selected", (evt) => {
   setCursor(evt.detail.cursor);
 });
 menuBar.addEventListener("keystroke-history-toggled", () => {
-  const isEnabled = document.getElementById("status-bar").keystrokeHistory
-    .isEnabled;
+  const isEnabled =
+    document.getElementById("status-bar").keystrokeHistory.isEnabled;
   setKeystrokeHistoryStatus(!isEnabled);
 });
 menuBar.addEventListener("keyboard-visibility-toggled", () => {
@@ -321,6 +322,9 @@ menuBar.addEventListener("video-settings-dialog-requested", () => {
 });
 menuBar.addEventListener("paste-requested", () => {
   showPasteOverlay();
+});
+menuBar.addEventListener("boot-requested", () => {
+  boot();
 });
 setKeyboardVisibility(settings.isKeyboardVisible());
 setKeystrokeHistoryStatus(settings.isKeystrokeHistoryEnabled());

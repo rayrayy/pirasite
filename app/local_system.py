@@ -1,5 +1,7 @@
 import logging
 import subprocess
+import time
+# import boot
 
 logger = logging.getLogger(__name__)
 
@@ -14,32 +16,73 @@ class ShutdownError(Error):
 
 def shutdown():
     logger.info('Shutting down system')
-    return _exec_shutdown(restart_after=False)
+    return _exec_shutdown(mode = "boot")
 
 
 def restart():
     logger.info('Rebooting system')
-    return _exec_shutdown(restart_after=True)
+    return _exec_shutdown(mode = "reboot")
 
 
-def _exec_shutdown(restart_after):
-    if restart_after:
-        param = '--reboot'
-    else:
-        param = '--poweroff'
+def _exec_shutdown(mode):
+    if mode == "reboot":
+        try:
+            result = subprocess.Popen('source app/boot.sh',
+                                    # capture_output=True,
+                                    # text=True,
+                                    # check=True, 
+                                    # shell=False,
+                                    stdout = subprocess.PIPE, 
+                                    stderr = subprocess.STDOUT,
+                                    shell=True, 
+                                    executable='/bin/bash')
+        except subprocess.CalledProcessError as e:
+            raise ShutdownError(e) from e
+        # if 'failed' in result.stderr.lower():
+        #     raise ShutdownError(result.stdout + result.stderr)
 
-    try:
-        result = subprocess.run(['sudo', '/sbin/shutdown', param, 'now'],
-                                capture_output=True,
-                                text=True,
-                                check=True)
-    except subprocess.CalledProcessError as e:
-        raise ShutdownError(e) from e
-    if 'failed' in result.stderr.lower():
-        raise ShutdownError(result.stdout + result.stderr)
+        if result.stdout:
+            logger.info(result.stdout.read())
+        if result.stderr:
+            logger.info(result.stderr.read())
+        time.sleep(5)
+        try:
+            result = subprocess.Popen('source app/boot.sh',
+                                    # capture_output=True,
+                                    # text=True,
+                                    # check=True, 
+                                    # shell=False,
+                                    stdout = subprocess.PIPE, 
+                                    stderr = subprocess.STDOUT,
+                                    shell=True, 
+                                    executable='/bin/bash')
+        except subprocess.CalledProcessError as e:
+            raise ShutdownError(e) from e
+        # if 'failed' in result.stderr.lower():
+        #     raise ShutdownError(result.stdout + result.stderr)
 
-    if result.stdout:
-        logger.info(result.stdout)
-    if result.stderr:
-        logger.info(result.stderr)
+        if result.stdout:
+            logger.info(result.stdout.read())
+        if result.stderr:
+            logger.info(result.stderr.read())
+    if mode == "boot":
+        try:
+            result = subprocess.Popen('source app/boot.sh',
+                                    # capture_output=True,
+                                    # text=True,
+                                    # check=True, 
+                                    # shell=False,
+                                    stdout = subprocess.PIPE, 
+                                    stderr = subprocess.STDOUT,
+                                    shell=True, 
+                                    executable='/bin/bash')
+        except subprocess.CalledProcessError as e:
+            raise ShutdownError(e) from e
+        # if 'failed' in result.stderr.lower():
+        #     raise ShutdownError(result.stdout + result.stderr)
+
+        if result.stdout:
+            logger.info(result.stdout.read())
+        if result.stderr:
+            logger.info(result.stderr.read())
     return True

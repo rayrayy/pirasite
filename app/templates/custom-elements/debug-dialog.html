@@ -41,16 +41,16 @@
 
   <!-- Get Debug Logs -->
   <div id="logs-loading">
-    <h3>Retrieving Debug Logs</h3>
+    <h3>Retrieving Power Logs</h3>
     <progress-spinner></progress-spinner>
   </div>
 
   <div id="logs-success">
-    <h3>Debug Logs</h3>
+    <h3>Power Loss Log</h3>
     <p class="logs monospace"></p>
-    <button class="share-btn btn-success" type="button">
+    <!-- <button class="share-btn btn-success" type="button">
       Get Shareable URL
-    </button>
+    </button> -->
     <button class="copy-btn btn-success" type="button">
       Copy to Clipboard
     </button>
@@ -138,9 +138,8 @@
           controllers
             .getDebugLogs()
             .then((text) => {
-              this.shadowRoot.querySelector(
-                "#logs-success .logs"
-              ).textContent = text;
+              this.shadowRoot.querySelector("#logs-success .logs").textContent =
+                text;
               this.state = "logs-success";
             })
             .catch((error) => {
@@ -167,14 +166,14 @@
 
         _getUrl() {
           this.state = "url-loading";
-          const text = this.shadowRoot.querySelector("#logs-success .logs")
-            .textContent;
+          const text = this.shadowRoot.querySelector(
+            "#logs-success .logs"
+          ).textContent;
           controllers
             .textToShareableUrl(text)
             .then((url) => {
-              const urlElement = this.shadowRoot.querySelector(
-                "#url-success .url"
-              );
+              const urlElement =
+                this.shadowRoot.querySelector("#url-success .url");
               urlElement.textContent = url;
               urlElement.href = url;
               this.state = "url-success";

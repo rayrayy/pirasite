@@ -48,13 +48,11 @@
 
   <div id="update-available">
     <h3>Update TinyPilot</h3>
-    <p>
-      An update is available. Would you like to install the latest version?
-    </p>
-    <button id="confirm-update" class="btn-success" type="button">
+    <p>An update is available. Would you like to install the latest version?</p>
+    <!-- <button id="confirm-update" class="btn-success" type="button">
       Update
     </button>
-    <button id="cancel-update" type="button">Cancel</button>
+    <button id="cancel-update" type="button">Exit</button> -->
   </div>
 
   <div id="latest">
@@ -141,11 +139,18 @@
                 this._state = "latest";
               } else {
                 this._state = "update-available";
+                // document.write(
+                //   "Current temperature: " +
+                //     localVersion +
+                //     "C. Current Humidity: " +
+                //     latestRelease +
+                //     "%."
+                // );
               }
             })
             .catch((error) => {
               this._handleUpdateFailure({
-                title: "Failed to Retrieve Version Information",
+                title: "Failed to Retrieve Temperature Information",
                 details: error,
               });
             });

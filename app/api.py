@@ -13,6 +13,7 @@ import update.settings
 import update.status
 import version
 import video_settings
+# import temperature
 
 api_blueprint = flask.Blueprint('api', __name__, url_prefix='/api')
 
@@ -67,19 +68,17 @@ def update_get():
         On success, a JSON data structure with the following properties:
         status: str describing the status of the job. Can be one of
                 ["NOT_RUNNING", "DONE", "IN_PROGRESS"].
+        updateError: str of the error that occured while updating. If no error
+                     occured, then this will be null.
 
         Example:
         {
-            "status": "NOT_RUNNING"
+            "status": "NOT_RUNNING",
+            "updateError": null
         }
-
-        Returns error object on failure.
     """
-
     status, error = update.status.get()
-    if error:
-        return json_response.error(error), 500
-    return json_response.success({'status': str(status)})
+    return json_response.success({'status': str(status), 'updateError': error})
 
 
 @api_blueprint.route('/update', methods=['PUT'])
@@ -102,6 +101,15 @@ def update_put():
         return json_response.error(e), 500
     return json_response.success()
 
+# @api_blueprint.route('/boot', methods=['PUT'])
+# def boot():
+
+#     try:
+#         local_system.shutdown()
+#     except update.launcher.Error as e:
+#         return json_response.error(e), 500
+#     return json_response.success()
+
 
 @api_blueprint.route('/version', methods=['GET'])
 def version_get():
@@ -122,6 +130,11 @@ def version_get():
         return json_response.success({'version': version.local_version()})
     except version.Error as e:
         return json_response.error(e), 500
+    # try:
+    #     env = temperature.tempData()
+    #     return json_response.success({'version': str(env[0])})
+    # except version.Error as e:
+    #     return json_response.error(e), 500
 
 
 @api_blueprint.route('/latestRelease', methods=['GET'])
@@ -143,6 +156,11 @@ def latest_release_get():
         return json_response.success({'version': version.latest_version()})
     except version.Error as e:
         return json_response.error(e), 500
+    # try:
+    #     env = temperature.tempData()
+    #     return json_response.success({'version': str(env[1])})
+    # except version.Error as e:
+    #     return json_response.error(e), 500
 
 
 @api_blueprint.route('/hostname', methods=['GET'])
@@ -329,3 +347,6 @@ def settings_video_apply_post():
     except video_settings.Error as e:
         return json_response.error(e), 500
     return json_response.success()
+
+
+# if __name__ == "__main__":

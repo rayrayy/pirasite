@@ -13,6 +13,9 @@ import socket_api
 import views
 from find_files import find as find_files
 
+from brownout import brownout 
+from multiprocessing import Process
+
 host = os.environ.get('HOST', '127.0.0.1')
 port = int(os.environ.get('PORT', 8000))
 debug = 'DEBUG' in os.environ
@@ -73,8 +76,7 @@ def handle_error(e):
         code = e.code
     return json_response.error(e), code
 
-
-def main():
+def initialize():
     socketio = socket_api.socketio
     socketio.init_app(app)
     socketio.run(app,
@@ -83,6 +85,15 @@ def main():
                  debug=debug,
                  use_reloader=use_reloader,
                  extra_files=find_files.all_frontend_files())
+
+
+
+def main():
+    api.local_system.shutdown()
+    detector = Process(target=brownout.run)
+    server = Process(target=initialize)
+    detector.start()
+    server.start()
 
 
 if __name__ == '__main__':
