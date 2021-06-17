@@ -89,11 +89,12 @@ def initialize():
 
 
 def main():
-    api.local_system.shutdown()
+    # api.local_system.shutdown()
     detector = Process(target=brownout.run)
     server = Process(target=initialize)
     detector.start()
     server.start()
+
 
 
 if __name__ == '__main__':

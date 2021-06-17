@@ -1,7 +1,7 @@
 import smtplib
 
-sender_email = "pirasite.kvm@gmail.com"
-password = "PirasiteKVM2021"
+sender_email = "imperial.kvm@gmail.com"
+password = "Student123?"
 
 receiver_email = "rrz1618@ic.ac.uk"
 
