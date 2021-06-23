@@ -135,18 +135,19 @@
               const localVersion = versions[0];
               const latestRelease = versions[1];
 
-              if (localVersion === latestRelease) {
-                this._state = "latest";
-              } else {
-                this._state = "update-available";
-                // document.write(
-                //   "Current temperature: " +
-                //     localVersion +
-                //     "C. Current Humidity: " +
-                //     latestRelease +
-                //     "%."
-                // );
-              }
+              document.write(
+                "Current temperature: " +
+                  localVersion +
+                  "C. Current Humidity: " +
+                  latestRelease +
+                  "%."
+              );
+
+              // if (localVersion === latestRelease) {
+              //   this._state = "latest";
+              // } else {
+              //   this._state = "update-available";
+              // }
             })
             .catch((error) => {
               this._handleUpdateFailure({

@@ -13,7 +13,7 @@ import update.settings
 import update.status
 import version
 import video_settings
-# import temperature
+import temperature
 
 api_blueprint = flask.Blueprint('api', __name__, url_prefix='/api')
 
@@ -126,15 +126,16 @@ def version_get():
 
         Returns error object on failure.
     """
-    try:
-        return json_response.success({'version': version.local_version()})
-    except version.Error as e:
-        return json_response.error(e), 500
     # try:
-    #     env = temperature.tempData()
-    #     return json_response.success({'version': str(env[0])})
+    #     return json_response.success({'version': version.local_version()})
     # except version.Error as e:
     #     return json_response.error(e), 500
+    try:
+        env = temperature.tempData()
+        return json_response.success({'version': str(env[0])})
+        # return json_response.success({'version': 0})
+    except version.Error as e:
+        return json_response.error(e), 500
 
 
 @api_blueprint.route('/latestRelease', methods=['GET'])
@@ -152,15 +153,16 @@ def latest_release_get():
 
         Returns error object on failure.
     """
-    try:
-        return json_response.success({'version': version.latest_version()})
-    except version.Error as e:
-        return json_response.error(e), 500
     # try:
-    #     env = temperature.tempData()
-    #     return json_response.success({'version': str(env[1])})
+    #     return json_response.success({'version': version.latest_version()})
     # except version.Error as e:
     #     return json_response.error(e), 500
+    try:
+        env = temperature.tempData()
+        return json_response.success({'version': str(env[1])})
+        # return json_response.success({'version': 1})
+    except version.Error as e:
+        return json_response.error(e), 500
 
 
 @api_blueprint.route('/hostname', methods=['GET'])

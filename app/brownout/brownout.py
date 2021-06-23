@@ -5,6 +5,7 @@ import os
 from brownout import mailing
 import datetime
 import bme680
+from temperature import tempData
 
 
 
@@ -12,10 +13,6 @@ import bme680
 def run():
     time.sleep(20)
 
-    # try:
-    #     sensor = bme680.BME680(bme680.I2C_ADDR_PRIMARY)
-    # except (RuntimeError, IOError):
-    #     sensor = bme680.BME680(bme680.I2C_ADDR_SECONDARY)
 
     current_time = datetime.datetime.now()
 
@@ -32,7 +29,7 @@ def run():
         logs.write(last_seen.strftime("%Y-%m-%d %H:%M:%S") + " : " + time_diff + "\n")
         logs.flush()
 
-    # highTemp = False
+    highTemp = False
 
     while True:
         current_time = datetime.datetime.now()
@@ -42,15 +39,14 @@ def run():
             f.write(current_time.strftime("%Y-%m-%d %H:%M:%S"))
             f.flush()
 
-        # if sensor.get_sensor_data():
-        #     temperature = sensor.data.temperature
+        temperature = tempData()[0]
 
 
-        # if temperature >= 30 and highTemp == False:
-        #     mailing.send_message("System Warning: The case temperature has reached " + str(temperature) +"C.")
-        #     highTemp = True
-        # if temperature < 30:
-        #     highTemp = False
+        if temperature >= 30 and highTemp == False:
+            mailing.send_message("System Warning: The case temperature has reached " + str(temperature) +"C.")
+            highTemp = True
+        if temperature < 30:
+            highTemp = False
 
         time.sleep(10)
 
