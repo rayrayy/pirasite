@@ -1,9 +1,11 @@
+
 # Imperial College London EIE Final Year Project - Pirasite
 
 This project is a KVM-over-IP switch for the Raspberry Pi. The code is based on the [TinyPilot](https://github.com/tiny-pilot/tinypilot) project by mtlynch, with these additional requested features implemented:
 
- - ATX Controller (Simulate physical power and reset button press)
- - Automatic boots up device after power loss
+ - ATX Controller
+    - Simulate physical power / reset button press
+    - Automatic boots up device after power loss
  - Temperature sensor
  - Power loss logging
  - Email notification system when power is restored 
