@@ -11,9 +11,9 @@ This project is a KVM-over-IP switch for the Raspberry Pi. The code is based on 
  - Email notification system when power is restored 
  - Email notification system when critical temperature threshold is reached
 
-To install the device, download the ROM from [here](https://drive.google.com/file/d/1aSob5RdnAuCULZ61CZmYZqtQMf1cMvJI/view?usp=sharing).
+To install the device, first download the ROM from [here](https://drive.google.com/file/d/1aSob5RdnAuCULZ61CZmYZqtQMf1cMvJI/view?usp=sharing).
 
-To install flash the SD card with the ROM, run the following command in Terminal:
+Then, to flash the SD card with the ROM, run the following command in Terminal:
   `sudo dd bs=4M if=/location/of/pirasite.img of=/dev/name_of_sd_card`
 
 The name of the SD card can be found by running the following command in Terminal:
